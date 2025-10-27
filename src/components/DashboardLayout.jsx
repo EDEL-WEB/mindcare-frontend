@@ -1,7 +1,7 @@
 import React from "react";
-import { NavLink } from "react-router-dom";
-import Topbar from "./Topbar";
-import Sidebar from "./Sidebar";
+import { NavLink, Outlet, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import LogoutButton from "./LogoutButton";
 
 const navByRole = {
   Admin: [
@@ -22,7 +22,10 @@ const navByRole = {
   ],
 };
 
-export default function DashboardLayout({ role, children }) {
+export default function DashboardLayout() {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const role = user?.role || 'client';
   const links = navByRole[role] || [];
   return (
     <div className="flex min-h-screen bg-gray-50 text-gray-800">
@@ -36,7 +39,7 @@ export default function DashboardLayout({ role, children }) {
             <NavLink
               to={l.to}
               key={i}
-              className={({isActive}) => `block px-4 py-2 rounded-md text-sm ${isActive ? "bg-slate-100 font-medium" : "hover:bg-slate-50"}`}
+              className={({ isActive }) => `block px-4 py-2 rounded-md text-sm ${isActive ? "bg-slate-100 font-medium" : "hover:bg-slate-50"}`}
             >
               {l.label}
             </NavLink>
@@ -54,19 +57,22 @@ export default function DashboardLayout({ role, children }) {
             </div>
             <div className="flex items-center gap-4">
               <button className="text-sm text-gray-600">Notifications</button>
-              <div className="flex items-center gap-2">
-                <div className="text-sm text-right">
-                  <div className="font-medium">Admin User</div>
-                  <div className="text-xs text-gray-500">admin@mindcare.app</div>
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2">
+                  <div className="text-sm text-right">
+                    <div className="font-medium">{user?.name || 'User'}</div>
+                    <div className="text-xs text-gray-500">{user?.email}</div>
+                  </div>
+                  <img src="https://i.pravatar.cc/40" alt="avatar" className="w-9 h-9 rounded-full" />
                 </div>
-                <img src="https://i.pravatar.cc/40" alt="avatar" className="w-9 h-9 rounded-full" />
+                <LogoutButton />
               </div>
             </div>
           </div>
         </header>
 
         <main className="max-w-7xl mx-auto p-6">
-          {children}
+          <Outlet />
         </main>
       </div>
     </div>
